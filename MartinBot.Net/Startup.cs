@@ -26,8 +26,8 @@ namespace MartinBot.Net {
         public void ConfigureServices (IServiceCollection services) {
             services.AddMvc ().SetCompatibilityVersion (CompatibilityVersion.Version_2_2);
             services.AddScoped<IUpdateService, UpdateService> ();
-            services.AddSingleton<IBotService, BotService> ();
             services.AddScoped<ICrawlerService, CrawlerService> ();
+            services.AddSingleton<IBotService, BotService> ();
             services.Configure<BotConfig> (Configuration.GetSection ("BotConfig"));
             services.Configure<CrawlerConfig> (Configuration.GetSection ("CrawlerConfig"));
         }

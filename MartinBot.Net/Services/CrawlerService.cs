@@ -1,36 +1,47 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp;
 using MartinBot.Net.Config;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace MartinBot.Net.Services {
     public class CrawlerService : ICrawlerService {
 
         private readonly CrawlerConfig _crawlerConfig;
+        private readonly ILogger<CrawlerService> _logger;
 
-        public CrawlerService (IOptions<CrawlerConfig> crawlerConfig) {
+        public CrawlerService (IOptions<CrawlerConfig> crawlerConfig, ILogger<CrawlerService> logger) {
             _crawlerConfig = crawlerConfig.Value;
+            _logger = logger;
         }
 
-        public async Task<string> GetLineStickerUrlsAsync (string url) {
+        public async Task<List<string>> GetLineStickerUrlsAsync (string url) {
             try {
                 var config = AngleSharp.Configuration.Default.WithDefaultLoader ();
                 var context = BrowsingContext.New (config);
 
-                string urlPattern = $"{_crawlerConfig.LineStickerHost}\\*";
+                string urlPattern = $"{_crawlerConfig.LineStickerHost}*";
                 Match checkedUrl = Regex.Match (url, urlPattern);
                 if (checkedUrl.Success) {
                     var document = await context.OpenAsync (url);
                     var stickerSelector = "span.mdCMN09Image.FnCustomBase";
-                    var images = document.QuerySelectorAll (stickerSelector);
+                    var linkTags = document.QuerySelectorAll (stickerSelector);
+                    var styleContents = linkTags.Select (t => t.GetAttribute ("sytle"));
+                    List<string> imageUrls = new List<string> ();
+                    foreach (var content in styleContents) {
+                        var imageUrl = content.Replace ("background-image:url(", "").Replace ("compress=true);", "");
+                        imageUrls.Add (imageUrl);
+                    }
+                    return imageUrls;
                 }
-
             } catch (Exception ex) {
-
+                _logger.LogError ($"GetLineStickerUrlsAsync() Error:[{ex}]");
             }
-            return "";
+            return new List<string> ();
         }
 
     }

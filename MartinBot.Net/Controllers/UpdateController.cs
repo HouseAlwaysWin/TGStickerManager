@@ -15,7 +15,6 @@ namespace MartinBot.Net.Controllers {
         [HttpPost]
         public async Task<IActionResult> Post ([FromBody] Update update) {
             await _updateService.EchoAsync (update);
-
             return Ok ();
         }
 
