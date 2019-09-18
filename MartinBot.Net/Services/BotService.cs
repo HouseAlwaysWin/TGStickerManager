@@ -1,5 +1,6 @@
 using System.Net.Http;
 using MartinBot.Net.Config;
+using MartinBot.Net.Services.interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;

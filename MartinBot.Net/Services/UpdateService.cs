@@ -52,6 +52,16 @@ namespace MartinBot.Net.Services {
                     switch (inputMsg.Text) {
                         case "":
                             break;
+                        default:
+                            var message = await _botService.Client.SendTextMessageAsync (
+                                chatId: inputMsg.Chat.Id,
+                                text: $"Choose tool you want to use",
+                                parseMode : ParseMode.Markdown,
+                                replyMarkup : new InlineKeyboardMarkup (new [] {
+                                    InlineKeyboardButton.WithCallbackData ("LineStickerTransfer", "Please send me Line Sticker Link"),
+                                })
+                            );
+                            break;
                     }
                     // if (inputMsg.Text == "/start") {
 
@@ -69,7 +79,11 @@ namespace MartinBot.Net.Services {
                     // );
                     // }
                 } else if (update.Type == UpdateType.CallbackQuery) {
-                    await _botService.Client.SendTextMessageAsync (update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Data);
+                    switch (inputMsg.Text) {
+                        case "line":
+                            await _botService.Client.SendTextMessageAsync (update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Data);
+                            break;
+                    }
                 }
             } catch (Exception ex) {
 
