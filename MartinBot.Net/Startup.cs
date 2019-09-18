@@ -27,7 +27,9 @@ namespace MartinBot.Net {
             services.AddMvc ().SetCompatibilityVersion (CompatibilityVersion.Version_2_2);
             services.AddScoped<IUpdateService, UpdateService> ();
             services.AddSingleton<IBotService, BotService> ();
+            services.AddScoped<ICrawlerService, CrawlerService> ();
             services.Configure<BotConfig> (Configuration.GetSection ("BotConfig"));
+            services.Configure<CrawlerConfig> (Configuration.GetSection ("CrawlerConfig"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
