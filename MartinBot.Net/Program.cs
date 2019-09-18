@@ -17,6 +17,6 @@ namespace MartinBot.Net {
         public static IWebHostBuilder CreateWebHostBuilder (string[] args) =>
             WebHost.CreateDefaultBuilder (args)
             .UseStartup<Startup> ()
-            .UseUrls ("http://localhost:8443");
+            .UseUrls ("http://localhost:8080");
     }
 }

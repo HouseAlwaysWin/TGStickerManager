@@ -86,7 +86,7 @@ namespace MartinBot.Net.Services {
                     }
                 }
             } catch (Exception ex) {
-
+                _logger.LogError($"{ex}");
             }
 
         }
