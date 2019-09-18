@@ -58,8 +58,8 @@ namespace MartinBot.Net.Services {
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public async Task<string> GetLineStickerTitle (string url) {
-            return string.Empty;
-        }
+        // public async Task<string> GetLineStickerTitle (string url) {
+        //     return string.Empty;
+        // }
     }
 }

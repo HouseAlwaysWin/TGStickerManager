@@ -2,3 +2,6 @@ obj/*
 .vs/*
 .vscode/*
 bin/*
+MartinBot.Net.Tests/obj/*
+MartinBot.Net.Tests/bin/*
+.nuget/*

@@ -49,20 +49,14 @@ namespace MartinBot.Net.Services {
                 var inputMsg = update.Message;
 
                 if (update.Type == UpdateType.Message) {
-                    switch (inputMsg.Text) {
-                        case "":
-                            break;
-                        default:
-                            var message = await _botService.Client.SendTextMessageAsync (
-                                chatId: inputMsg.Chat.Id,
-                                text: $"Choose tool you want to use",
-                                parseMode : ParseMode.Markdown,
-                                replyMarkup : new InlineKeyboardMarkup (new [] {
-                                    InlineKeyboardButton.WithCallbackData ("LineStickerTransfer", "Please send me Line Sticker Link"),
-                                })
-                            );
-                            break;
-                    }
+                    var message = await _botService.Client.SendTextMessageAsync (
+                        chatId: inputMsg.Chat.Id,
+                        text: $"Choose tool you want to use",
+                        parseMode : ParseMode.Markdown,
+                        replyMarkup : new InlineKeyboardMarkup (new [] {
+                            InlineKeyboardButton.WithCallbackData ("LineStickerTransfer", "Line"),
+                        })
+                    );
                     // if (inputMsg.Text == "/start") {
 
                     // Message message = await _botService.Client.SendTextMessageAsync (
@@ -79,14 +73,14 @@ namespace MartinBot.Net.Services {
                     // );
                     // }
                 } else if (update.Type == UpdateType.CallbackQuery) {
-                    switch (inputMsg.Text) {
-                        case "line":
-                            await _botService.Client.SendTextMessageAsync (update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Data);
+                    switch (update.CallbackQuery.Data) {
+                        case "Line":
+                            await _botService.Client.SendTextMessageAsync (update.CallbackQuery.Message.Chat.Id, "Start Transfer");
                             break;
                     }
                 }
             } catch (Exception ex) {
-                _logger.LogError($"{ex}");
+                _logger.LogError ($"{ex}");
             }
 
         }

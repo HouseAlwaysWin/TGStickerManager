@@ -10,9 +10,9 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 
-namespace MartinBot.Net.Test {
+namespace MartinBot.Net.Tests {
     [TestFixture]
-    public class CrawlerServiceTest {
+    public class CrawlerServiceTests {
         private IOptions<CrawlerConfig> _config;
         private CrawlerService _service;
 
@@ -38,7 +38,7 @@ namespace MartinBot.Net.Test {
         public async Task CanGetLineStickerUrlsGreaterThanZero () {
             var url = "https://store.line.me/stickershop/product/7920494/zh-Hant?from=sticker";
             var result = await _service.GetLineStickerUrlsAsync (url);
-            Assert.Greater (0, result.Count);
+            Assert.Greater (result.Count, 0);
         }
 
     }

@@ -1,5 +1,5 @@
 .vscode/*
-MartinBot.Net.Test/obj/*
+MartinBot.Net.Tests/obj/*
 bin/*
 *.dll
 *.tmp
@@ -8,5 +8,4 @@ bin/*
 *.dylib
 *.so
 *.cache
-MartinBot.Net.Test/bin/*
-MartinBot.Net.Test/*
+MartinBot.Net.Tests/bin/*
