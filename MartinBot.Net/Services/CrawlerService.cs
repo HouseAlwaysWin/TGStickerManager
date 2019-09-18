@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp;
 using MartinBot.Net.Config;
+using MartinBot.Net.Services.interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -19,6 +20,11 @@ namespace MartinBot.Net.Services {
             _logger = logger;
         }
 
+        /// <summary>
+        /// Get Line Sticker By Crawling  
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public async Task<List<string>> GetLineStickerUrlsAsync (string url) {
             try {
                 var config = AngleSharp.Configuration.Default.WithDefaultLoader ();
@@ -29,7 +35,7 @@ namespace MartinBot.Net.Services {
                 if (checkedUrl.Success) {
                     var document = await context.OpenAsync (url);
                     var stickerSelector = "span.mdCMN09Image.FnCustomBase";
-                
+
                     var linkTags = document.QuerySelectorAll (stickerSelector);
                     var styleContents = linkTags.Select (m => m.GetAttribute ("style"));
 
@@ -47,5 +53,13 @@ namespace MartinBot.Net.Services {
             return new List<string> ();
         }
 
+        /// <summary>
+        /// TO DO
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public async Task<string> GetLineStickerTitle (string url) {
+            return string.Empty;
+        }
     }
 }

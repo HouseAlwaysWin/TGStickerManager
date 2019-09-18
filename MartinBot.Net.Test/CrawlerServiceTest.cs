@@ -18,6 +18,7 @@ namespace MartinBot.Net.Test {
 
         [OneTimeSetUp]
         public void GlobalPrepare () {
+            /* Set up configuration  */
             var configuration = new ConfigurationBuilder ()
                 .SetBasePath (Directory.GetCurrentDirectory ())
                 .AddJsonFile ("appsettings.json", false)

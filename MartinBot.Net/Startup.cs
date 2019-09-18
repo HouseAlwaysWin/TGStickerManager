@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MartinBot.Net.Config;
 using MartinBot.Net.Services;
+using MartinBot.Net.Services.interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -25,9 +26,12 @@ namespace MartinBot.Net {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices (IServiceCollection services) {
             services.AddMvc ().SetCompatibilityVersion (CompatibilityVersion.Version_2_2);
-            services.AddScoped<IUpdateService, UpdateService> ();
-            services.AddScoped<ICrawlerService, CrawlerService> ();
+
+            services.AddSingleton<IUpdateService, UpdateService> ();
+            services.AddSingleton<ICrawlerService, CrawlerService> ();
+            services.AddSingleton<IImageService, ImageService> ();
             services.AddSingleton<IBotService, BotService> ();
+
             services.Configure<BotConfig> (Configuration.GetSection ("BotConfig"));
             services.Configure<CrawlerConfig> (Configuration.GetSection ("CrawlerConfig"));
         }
