@@ -1,5 +1,5 @@
 namespace MartinBot.Net.Config {
     public class CrawlerConfig {
-        public string LineStickerHost { get; private set; }
+        public string LineStickerHost { get; set; }
     }
 }

@@ -29,13 +29,16 @@ namespace MartinBot.Net.Services {
                 if (checkedUrl.Success) {
                     var document = await context.OpenAsync (url);
                     var stickerSelector = "span.mdCMN09Image.FnCustomBase";
+                
                     var linkTags = document.QuerySelectorAll (stickerSelector);
-                    var styleContents = linkTags.Select (t => t.GetAttribute ("sytle"));
+                    var styleContents = linkTags.Select (m => m.GetAttribute ("style"));
+
                     List<string> imageUrls = new List<string> ();
                     foreach (var content in styleContents) {
                         var imageUrl = content.Replace ("background-image:url(", "").Replace ("compress=true);", "");
                         imageUrls.Add (imageUrl);
                     }
+
                     return imageUrls;
                 }
             } catch (Exception ex) {
