@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net.Test\\MartinBot.Net.Test.csproj": {}
+    "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net.Test\\MartinBot.Net.Test.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net.Test\\MartinBot.Net.Test.csproj": {
+    "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net.Test\\MartinBot.Net.Test.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net.Test\\MartinBot.Net.Test.csproj",
+        "projectUniqueName": "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net.Test\\MartinBot.Net.Test.csproj",
         "projectName": "MartinBot.Net.Test",
-        "projectPath": "C:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net.Test\\MartinBot.Net.Test.csproj",
+        "projectPath": "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net.Test\\MartinBot.Net.Test.csproj",
         "packagesPath": "C:\\Users\\Martin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net.Test\\obj\\",
+        "outputPath": "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net.Test\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -30,7 +30,11 @@
         },
         "frameworks": {
           "netcoreapp3.0": {
-            "projectReferences": {}
+            "projectReferences": {
+              "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net\\MartinBot.Net.csproj": {
+                "projectPath": "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net\\MartinBot.Net.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -42,9 +46,21 @@
       "frameworks": {
         "netcoreapp3.0": {
           "dependencies": {
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Microsoft.Extensions.Options": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
               "version": "[15.9.0, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.13.0, )"
             },
             "NUnit3TestAdapter": {
               "target": "Package",
@@ -70,6 +86,92 @@
               "privateAssets": "all"
             }
           },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100-preview8-013656\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net\\MartinBot.Net.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net\\MartinBot.Net.csproj",
+        "projectName": "MartinBot.Net",
+        "projectPath": "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net\\MartinBot.Net.csproj",
+        "packagesPath": "C:\\Users\\Martin\\.nuget\\packages\\",
+        "outputPath": "c:\\Users\\Martin\\Desktop\\Test\\MartinBot.Net\\MartinBot.Net\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Martin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp2.2"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "http://192.168.19.218:1680/nuget": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp2.2": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp2.2": {
+          "dependencies": {
+            "AngleSharp": {
+              "target": "Package",
+              "version": "[0.13.0, )"
+            },
+            "Magick.NET-Q16-AnyCPU": {
+              "target": "Package",
+              "version": "[7.13.0, )"
+            },
+            "Microsoft.AspNetCore.App": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.2.0, )",
+              "autoReferenced": true
+            },
+            "Microsoft.AspNetCore.Razor.Design": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Microsoft.NETCore.App": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.2.0, )",
+              "autoReferenced": true
+            },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[1.0.0-beta0007, )"
+            },
+            "Telegram.Bot": {
+              "target": "Package",
+              "version": "[14.11.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100-preview8-013656\\RuntimeIdentifierGraph.json"
         }
       }

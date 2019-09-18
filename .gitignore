@@ -1,0 +1,12 @@
+.vscode/*
+MartinBot.Net.Test/obj/*
+bin/*
+*.dll
+*.tmp
+*.props
+*.pdb
+*.dylib
+*.so
+*.cache
+MartinBot.Net.Test/bin/*
+MartinBot.Net.Test/*
