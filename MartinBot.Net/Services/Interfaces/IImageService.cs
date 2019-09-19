@@ -4,6 +4,6 @@ using Telegram.Bot;
 
 namespace MartinBot.Net.Services.interfaces {
     public interface IImageService {
-        Task<List<Telegram.Bot.Types.File>> GetImageByPath (TelegramBotClient bot, string path, int userId);
+        Task<Telegram.Bot.Types.File> UploadResizeImagesToTG (TelegramBotClient bot, string path, int userId);
     }
 }

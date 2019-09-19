@@ -30,23 +30,23 @@ namespace MartinBot.Net.Services {
                 var config = AngleSharp.Configuration.Default.WithDefaultLoader ();
                 var context = BrowsingContext.New (config);
 
-                string urlPattern = $"{_crawlerConfig.LineStickerHost}*";
-                Match checkedUrl = Regex.Match (url, urlPattern);
-                if (checkedUrl.Success) {
-                    var document = await context.OpenAsync (url);
-                    var stickerSelector = "span.mdCMN09Image.FnCustomBase";
+                // string urlPattern = $"{_crawlerConfig.LineStickerHost}*";
+                // Match checkedUrl = Regex.Match (url, urlPattern);
+                // if (checkedUrl.Success) {
+                var document = await context.OpenAsync (url);
+                var stickerSelector = "span.mdCMN09Image.FnCustomBase";
 
-                    var linkTags = document.QuerySelectorAll (stickerSelector);
-                    var styleContents = linkTags.Select (m => m.GetAttribute ("style"));
+                var linkTags = document.QuerySelectorAll (stickerSelector);
+                var styleContents = linkTags.Select (m => m.GetAttribute ("style"));
 
-                    List<string> imageUrls = new List<string> ();
-                    foreach (var content in styleContents) {
-                        var imageUrl = content.Replace ("background-image:url(", "").Replace ("compress=true);", "");
-                        imageUrls.Add (imageUrl);
-                    }
-
-                    return imageUrls;
+                List<string> imageUrls = new List<string> ();
+                foreach (var content in styleContents) {
+                    var imageUrl = content.Replace ("background-image:url(", "").Replace ("compress=true);", "");
+                    imageUrls.Add (imageUrl);
                 }
+
+                return imageUrls;
+                // }
             } catch (Exception ex) {
                 _logger.LogError ($"GetLineStickerUrlsAsync() Error:[{ex}]");
             }
@@ -58,8 +58,18 @@ namespace MartinBot.Net.Services {
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        // public async Task<string> GetLineStickerTitle (string url) {
-        //     return string.Empty;
-        // }
+        public async Task<string> GetTextBySelector (string url, string selector) {
+            try {
+                var config = AngleSharp.Configuration.Default.WithDefaultLoader ();
+                var context = BrowsingContext.New (config);
+                var document = await context.OpenAsync (url);
+                var cells = document.QuerySelector (selector);
+                var text = cells.TextContent;
+                return text;
+            } catch (Exception ex) {
+                _logger.LogError ($"{ex}");
+            }
+            return string.Empty;
+        }
     }
 }

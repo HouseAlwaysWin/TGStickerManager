@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using MartinBot.Net.Config;
 using MartinBot.Net.Services.interfaces;
@@ -14,6 +15,7 @@ namespace MartinBot.Net.Services {
         public BotService (IOptions<BotConfig> botConfig) {
             _botConfig = botConfig.Value;
             Client = new TelegramBotClient (_botConfig.BotToken);
+            Client.Timeout = TimeSpan.FromMinutes (3);
         }
     }
 }

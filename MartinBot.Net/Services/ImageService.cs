@@ -16,8 +16,7 @@ namespace MartinBot.Net.Services {
         /// <param name="path">resource path</param>
         /// <param name="userId">telegram message userId(chatId)</param>
         /// <returns></returns>
-        public async Task<List<Telegram.Bot.Types.File>> GetImageByPath (TelegramBotClient bot, string path, int userId) {
-            List<Telegram.Bot.Types.File> files = new List<Telegram.Bot.Types.File> ();
+        public async Task<Telegram.Bot.Types.File> UploadResizeImagesToTG (TelegramBotClient bot, string path, int userId) {
             using (Image image = Image.Load (path)) {
                 image.Mutate (m => m.Resize (512, 512));
                 image.Save (path);
@@ -26,10 +25,9 @@ namespace MartinBot.Net.Services {
                         userId: userId,
                         pngSticker: new Telegram.Bot.Types.InputFiles.InputFileStream (fs)
                     );
-                    files.Add (file);
+                    return file;
                 }
             };
-            return files;
         }
     }
 }
