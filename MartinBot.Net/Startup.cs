@@ -33,7 +33,7 @@ namespace MartinBot.Net {
             services.AddSingleton<IBotService, BotService> ();
 
             services.Configure<BotConfig> (Configuration.GetSection ("BotConfig"));
-            services.Configure<CrawlerConfig> (Configuration.GetSection ("CrawlerConfig"));
+            services.Configure<LineStickerInfo> (Configuration.GetSection ("LineStickerInfo"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

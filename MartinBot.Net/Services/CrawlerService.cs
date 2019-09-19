@@ -12,11 +12,11 @@ using Microsoft.Extensions.Options;
 namespace MartinBot.Net.Services {
     public class CrawlerService : ICrawlerService {
 
-        private readonly CrawlerConfig _crawlerConfig;
+        private readonly LineStickerInfo _lineStickerInfoConfig;
         private readonly ILogger<CrawlerService> _logger;
 
-        public CrawlerService (IOptions<CrawlerConfig> crawlerConfig, ILogger<CrawlerService> logger) {
-            _crawlerConfig = crawlerConfig.Value;
+        public CrawlerService (IOptions<LineStickerInfo> lineStickerInfoConfig, ILogger<CrawlerService> logger) {
+            _lineStickerInfoConfig = lineStickerInfoConfig.Value;
             _logger = logger;
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -19,17 +20,17 @@ namespace MartinBot.Net.Services {
         private readonly ICrawlerService _crawlerService;
         private readonly IImageService _imageService;
         private readonly ILogger<UpdateService> _logger;
-        private readonly IOptions<CrawlerConfig> _crawlerConfig;
+        private readonly IOptions<LineStickerInfo> _lineStickerInfoConfig;
 
         public UpdateService (
             IBotService botService,
             ICrawlerService crawlerService,
-            IOptions<CrawlerConfig> crawlerConfig,
+            IOptions<LineStickerInfo> lineStickerInfoConfig,
             IImageService imageService,
             ILogger<UpdateService> logger) {
             _botService = botService;
             _crawlerService = crawlerService;
-            _crawlerConfig = crawlerConfig;
+            _lineStickerInfoConfig = lineStickerInfoConfig;
             _imageService = imageService;
             _logger = logger;
         }
@@ -61,73 +62,73 @@ namespace MartinBot.Net.Services {
             var currentPath = Directory.GetCurrentDirectory () + tempFolder;
             try {
                 if (update.Type == UpdateType.Message) {
-                    // if (false) {
-                    string urlPattern = $"{_crawlerConfig.Value.LineStickerHost}*";
-                    Match checkedUrl = Regex.Match (inputMsg.Text, urlPattern);
 
-                    if (checkedUrl.Success) {
-                        await _botService.Client.SendTextMessageAsync (
-                            chatId: inputMsg.Chat.Id,
-                            text: "Line 連結正確,開始轉換貼圖"
-                        );
+                    var lineId = Regex.Match (inputMsg.Text, @"\d+").Value;
+                    var downloadUrl = string.Format (_lineStickerInfoConfig.Value.NormalStickerUrl, lineId);
+                    List<Telegram.Bot.Types.File> files = new List<Telegram.Bot.Types.File> ();
+                    var zipFile = $"\\{Guid.NewGuid ().ToString("N")}.zip";
+                    var path = currentPath + zipFile;
 
-                        var imageUrls = await _crawlerService.GetLineStickerUrlsAsync (inputMsg.Text);
-                        List<Telegram.Bot.Types.File> files = new List<Telegram.Bot.Types.File> ();
+                    using (var wc = new WebClient ()) {
+                        wc.DownloadFile (new Uri (downloadUrl), path);
+                    }
 
-                        foreach (var url in imageUrls) {
-                            var imgName = $"\\{Guid.NewGuid ().ToString("N")}.png";
-                            var path = currentPath + imgName;
-                            using (var wc = new WebClient ()) {
-                                wc.DownloadFile (new Uri (url), path);
-                            }
-                            var file = await _imageService.UploadResizeImagesToTG (_botService.Client, path, (int) inputMsg.Chat.Id);
+                    ZipFile.ExtractToDirectory (path, currentPath);
+
+                    var imgFolder = new DirectoryInfo (currentPath);
+                    foreach (var img in imgFolder.GetFiles ()) {
+                        if (Regex.Match (img.Name, @"^\d+@2x.png").Success) {
+                            var file = await _imageService.UploadResizeImagesToTG (_botService.Client, img.FullName, (int) inputMsg.Chat.Id);
                             files.Add (file);
                         }
+                    }
+                    // }
 
-                        string tempName = $"bot{Guid.NewGuid ().ToString ("N")}_by_martinwangBot";
+                    string tempName = $"bot{Guid.NewGuid ().ToString ("N")}_by_martinwangBot";
 
-                        int firstEmojiUnicode = 0x1F601;
-                        var emojiString = char.ConvertFromUtf32 (firstEmojiUnicode);
-                        var stickerTitle = await _crawlerService.GetTextBySelector (
-                            inputMsg.Text, "div.mdCMN38Item0lHead>.mdCMN38Item01Ttl");
+                    int firstEmojiUnicode = 0x1F601;
+                    var emojiString = char.ConvertFromUtf32 (firstEmojiUnicode);
+                    // var stickerTitle = await _crawlerService.GetTextBySelector (
+                    //     inputMsg.Text, "div.mdCMN38Item0lHead>.mdCMN38Item01Ttl");
+                    var stickerTitle = "TransferBy@MartinBot";
 
-                        await _botService.Client.CreateNewStickerSetAsync (
+                    await _botService.Client.CreateNewStickerSetAsync (
+                        userId: (int) inputMsg.Chat.Id,
+                        name : tempName,
+                        title : stickerTitle,
+                        pngSticker : files[0].FileId,
+                        emojis : emojiString
+                    );
+
+                    for (int i = 0; i < files.Count; i++) {
+                        emojiString = char.ConvertFromUtf32 (firstEmojiUnicode + i);
+                        await _botService.Client.AddStickerToSetAsync (
                             userId: (int) inputMsg.Chat.Id,
                             name : tempName,
-                            title : stickerTitle,
-                            pngSticker : files[0].FileId,
+                            pngSticker : files[i].FileId,
                             emojis : emojiString
                         );
-
-                        for (int i = 0; i < files.Count; i++) {
-                            emojiString = char.ConvertFromUtf32 (firstEmojiUnicode + i);
-                            await _botService.Client.AddStickerToSetAsync (
-                                userId: (int) inputMsg.Chat.Id,
-                                name : tempName,
-                                pngSticker : files[i].FileId,
-                                emojis : emojiString
-                            );
-                        }
-
-                        var stickerSet = await _botService.Client.GetStickerSetAsync (
-                            name: tempName
-                        );
-
-                        var sticker = stickerSet.Stickers[0];
-
-                        await _botService.Client.SendStickerAsync (
-                            chatId: new ChatId (inputMsg.Chat.Id),
-                            sticker: new Telegram.Bot.Types.InputFiles.InputOnlineFile (sticker.FileId)
-                        );
-
-                    } else {
-                        await _botService.Client.SendTextMessageAsync (
-                            chatId: inputMsg.Chat.Id,
-                            text: $" Please, Send me a line sticker link "
-                        );
                     }
-                    Directory.Delete (currentPath, true);
+
+                    var stickerSet = await _botService.Client.GetStickerSetAsync (
+                        name: tempName
+                    );
+
+                    var sticker = stickerSet.Stickers[0];
+
+                    await _botService.Client.SendStickerAsync (
+                        chatId: new ChatId (inputMsg.Chat.Id),
+                        sticker: new Telegram.Bot.Types.InputFiles.InputOnlineFile (sticker.FileId)
+                    );
+
+                } else {
+                    await _botService.Client.SendTextMessageAsync (
+                        chatId: inputMsg.Chat.Id,
+                        text: $" Please, Send me a line sticker link "
+                    );
                 }
+                Directory.Delete (currentPath, true);
+                // }
             } catch (Exception ex) {
                 _logger.LogError ($"{ex}");
                 Directory.Delete (currentPath, true);

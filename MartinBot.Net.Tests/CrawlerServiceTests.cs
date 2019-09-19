@@ -13,7 +13,7 @@ using NUnit.Framework;
 namespace MartinBot.Net.Tests {
     [TestFixture]
     public class CrawlerServiceTests {
-        private IOptions<CrawlerConfig> _config;
+        private IOptions<LineStickerInfo> _config;
         private CrawlerService _service;
 
         [OneTimeSetUp]
@@ -25,7 +25,7 @@ namespace MartinBot.Net.Tests {
                 .Build ();
 
             _config = Options.Create (configuration.GetSection ("CrawlerConfig")
-                .Get<CrawlerConfig> ());
+                .Get<LineStickerInfo> ());
         }
 
         [SetUp]
