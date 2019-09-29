@@ -13,8 +13,7 @@ using NUnit.Framework;
 namespace MartinBot.Net.Tests {
     [TestFixture]
     public class CrawlerServiceTests {
-        private IOptions<LineStickerInfo> _config;
-        private CrawlerService _service;
+        private IOptions<LineStickerConfig> _config;
 
         [OneTimeSetUp]
         public void GlobalPrepare () {
@@ -25,20 +24,7 @@ namespace MartinBot.Net.Tests {
                 .Build ();
 
             _config = Options.Create (configuration.GetSection ("CrawlerConfig")
-                .Get<LineStickerInfo> ());
-        }
-
-        [SetUp]
-        public void PerTestPrepare () {
-            var logger = new Mock<ILogger<CrawlerService>> ().Object;
-            _service = new CrawlerService (_config, logger);
-        }
-
-        [Test]
-        public async Task CanGetLineStickerUrlsGreaterThanZero () {
-            var url = "https://store.line.me/stickershop/product/7920494/zh-Hant?from=sticker";
-            var result = await _service.GetLineStickerUrlsAsync (url);
-            Assert.Greater (result.Count, 0);
+                .Get<LineStickerConfig> ());
         }
 
     }

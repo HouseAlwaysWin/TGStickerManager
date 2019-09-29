@@ -17,6 +17,7 @@ using Telegram.Bot;
 
 namespace MartinBot.Net {
     public class Startup {
+        private ITelegramBotClient BotClient;
         public Startup (IConfiguration configuration) {
             Configuration = configuration;
         }
@@ -26,14 +27,15 @@ namespace MartinBot.Net {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices (IServiceCollection services) {
             services.AddMvc ().SetCompatibilityVersion (CompatibilityVersion.Version_2_2);
+            var config = new GlobalConfig ();
 
+            Configuration.Bind ("GlobalConfig", config);
+            BotClient = new TelegramBotClient (config.BotConfig.BotToken);
+            BotClient.SetWebhookAsync (config.BotConfig.WebhookUrl).Wait ();
+
+            services.AddSingleton (config);
+            services.AddSingleton (BotClient);
             services.AddSingleton<IUpdateService, UpdateService> ();
-            services.AddSingleton<ICrawlerService, CrawlerService> ();
-            services.AddSingleton<IImageService, ImageService> ();
-            services.AddSingleton<IBotService, BotService> ();
-
-            services.Configure<BotConfig> (Configuration.GetSection ("BotConfig"));
-            services.Configure<LineStickerInfo> (Configuration.GetSection ("LineStickerInfo"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
