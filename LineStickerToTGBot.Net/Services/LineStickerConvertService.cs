@@ -185,7 +185,7 @@ namespace LineStickerToTGBotAPI.Services
 
         }
 
-        private async Task UploadedStaticStickerToTGSticker(long userId, string stickerName, string emojis, int stickerNumber)
+        private async Task<List<Telegram.Bot.Types.File>> UploadedStaticStickerToTGSticker(long userId, string stickerName, string emojis, int stickerNumber)
         {
             using (var hc = new HttpClient())
             {
@@ -199,7 +199,7 @@ namespace LineStickerToTGBotAPI.Services
                 catch (Exception ex)
                 {
                     _logger.Log(LogLevel.Error, $"{ex}");
-                    return;
+                    return files;
                 }
                 using (ZipArchive zipFile = new ZipArchive(imgsZip))
                 {
@@ -224,12 +224,13 @@ namespace LineStickerToTGBotAPI.Services
                                 catch (Exception ex)
                                 {
                                     _logger.Log(LogLevel.Error, $"{ex}");
-                                    return;
+                                    return files;
                                 }
                             }
                         }
                     };
                 }
+                return files;
             }
         }
 
