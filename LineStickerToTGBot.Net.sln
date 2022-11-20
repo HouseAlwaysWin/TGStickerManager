@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32804.467
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LineStickerToTGBotAPI", "LineStickerToTGBot.Net\LineStickerToTGBotAPI.csproj", "{B8DED98F-F10D-42F8-8A32-ABEB7EE0E255}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8DED98F-F10D-42F8-8A32-ABEB7EE0E255}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8DED98F-F10D-42F8-8A32-ABEB7EE0E255}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8DED98F-F10D-42F8-8A32-ABEB7EE0E255}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8DED98F-F10D-42F8-8A32-ABEB7EE0E255}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F92BE60C-FB49-4422-8ACA-90CFB630957A}
+	EndGlobalSection
+EndGlobal
