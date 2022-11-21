@@ -62,7 +62,6 @@ namespace LineStickerToTGBotAPI.Services
             var botInfo = await _botClient.GetMeAsync();
             var stickerName = $"botLineStickerToTg_by_{botInfo.Username}";
             //var fileBytes = await IOFile.ReadAllBytesAsync(url);
-            int firstEmojiUnicode = 0x1F601;
             //var emojiString = char.ConvertFromUtf32(firstEmojiUnicode);
 
 
@@ -174,6 +173,12 @@ namespace LineStickerToTGBotAPI.Services
             //    _logger.LogError(ex.ToString());
             //}
 
+            await AddConvertedVideoStickerToTGSticker(
+                userId: message.From.Id,
+                title: "",
+                stickerName: stickerName,
+                emojiUnicode: firstEmojiUnicode,);
+
             var stickerSet = await _botClient.GetStickerSetAsync(
                  name: stickerName
              );
@@ -264,12 +269,13 @@ namespace LineStickerToTGBotAPI.Services
             }
         }
 
-        private async Task AddConvertedVideoStickerToTGSticker(long userId, string title, string stickerName, int emojiUnicode, int stickerNumber)
+        private async Task AddConvertedVideoStickerToTGSticker(long userId, string title, string stickerName, int stickerNumber)
         {
 
             using (var hc = new HttpClient())
             {
-                var emojiString = char.ConvertFromUtf32(emojiUnicode);
+                int firstEmojiUnicode = 0x1F601;
+                var firstEmojiString = char.ConvertFromUtf32(firstEmojiUnicode);
                 var ffmpegArg = @$"-i pipe:.png -vf scale=512:-1 -f webm pipe:1";
                 Stream imgsZip = null;
                 string downloadUrl = string.Format(_botConfig.LineAnimatedStickerUrl, stickerNumber);
@@ -286,12 +292,12 @@ namespace LineStickerToTGBotAPI.Services
                 {
                     try
                     {
-                        await CheckAndSetStickerSetAsync(stickerName, title, userId, emojiString, zipFile, ffmpegArg);
+                        await CheckAndSetStickerSetAsync(stickerName, title, userId, firstEmojiString, zipFile, ffmpegArg);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex.ToString());
-                        await CheckAndSetStickerSetAsync(stickerName, title, userId, emojiString, zipFile, ffmpegArg);
+                        await CheckAndSetStickerSetAsync(stickerName, title, userId, firstEmojiString, zipFile, ffmpegArg);
                     }
 
                     foreach (var entry in zipFile.Entries)
@@ -309,6 +315,9 @@ namespace LineStickerToTGBotAPI.Services
                                                  .WithStandardOutputPipe(PipeTarget.ToStream(ms))
                                                  .ExecuteAsync();
                                     ms.Seek(0, SeekOrigin.Begin);
+                                    firstEmojiUnicode++;
+                                    var emojiString = char.ConvertFromUtf32(firstEmojiUnicode);
+
                                     await _botClient.AddVideoStickerToSetAsync(
                                          userId: userId,
                                          name: stickerName,
