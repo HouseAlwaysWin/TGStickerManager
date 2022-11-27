@@ -400,6 +400,9 @@ namespace LineStickerToTGBotAPI.Services
                                                  .ExecuteAsync();
 
                                     ms.Seek(0, SeekOrigin.Begin);
+                                    //firstEmojiUnicode++;
+                                    //var emojiString = char.ConvertFromUtf32(firstEmojiUnicode);
+
                                     await _botClient.AddVideoStickerToSetAsync(
                                          userId: userId,
                                          name: stickerName,
