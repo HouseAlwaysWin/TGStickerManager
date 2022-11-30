@@ -12,6 +12,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using LineStickerToTGBotAPI.Models;
 using Telegram.Bot.Types.ReplyMarkups;
+using System.IO.Pipes;
 
 namespace LineStickerToTGBotAPI.Services
 {
@@ -116,7 +117,7 @@ namespace LineStickerToTGBotAPI.Services
             //var randomName = Guid.NewGuid().ToString("N");
             ////var arg = @$"-i {rootPath}\538098031@2x.png -vf scale=512:-1 {randomName}.webm";
             //var arg = @$"-i pipe:.png -f webm pipe:1";
-            var arg = @$" -i pipe:.png -vf scale=512:-1 -f webm pipe:1";
+            //var arg = @$" -i pipe:.png -vf scale=512:-1 -f webm pipe:1";
             //var arg = @$"-i pipe:.png -vf scale=512:512:force_original_aspect_ratio=decrease:flags=lanczos -pix_fmt yuva420p -c:v libvpx-vp9 -cpu-used 5 -minrate 50k -b:v 350k -maxrate 450k -to 00:00:02.900 -an -y -f webm pipe:1";
             //var url = @"D:\Projects\ffmpeg\stickerpack@2x\animation@2x\ouput.webm";
             var botInfo = await _botClient.GetMeAsync();
@@ -129,23 +130,8 @@ namespace LineStickerToTGBotAPI.Services
             int stickerNumber = 23303;
             var guidstring = Guid.NewGuid().ToString("N");
             //var stickerName = $"linesticker_{guidstring}_by_{botInfo.Username}";
-            //await AddAutoLineStickerToVideoStickerAsync(message.From.Id, "", stickerName, stickerNumber);
+            await AddAutoLineStickerToVideoStickerAsync(message.From.Id, "", stickerName, stickerNumber);
 
-
-
-            //var process = new Process
-            //{
-            //    StartInfo =
-            //    {
-            //        FileName = "ffmpeg.exe",
-            //        Arguments = arg,
-            //        UseShellExecute = false,
-            //        CreateNoWindow = true,
-            //        RedirectStandardInput = true,
-            //    }
-            //};
-
-            //process.Start();
 
             var stickerSet = await _botClient.GetStickerSetAsync(
                name: stickerName
@@ -336,9 +322,11 @@ namespace LineStickerToTGBotAPI.Services
                 {
                     try
                     {
+                        StartNamePipedServer(firstSticker.Open());
+
                         var result = await Cli.Wrap("ffmpeg")
                                      .WithArguments(ffmpegArg)
-                                     .WithStandardInputPipe(PipeSource.FromStream(firstSticker.Open()))
+                                     //.WithStandardInputPipe(PipeSource.FromStream(firstSticker.Open()))
                                      .WithStandardOutputPipe(PipeTarget.ToStream(ms))
                                      .ExecuteAsync();
                         ms.Seek(0, SeekOrigin.Begin);
@@ -367,8 +355,9 @@ namespace LineStickerToTGBotAPI.Services
 
                 var emojiString = char.ConvertFromUtf32(emojiUnicode);
                 //var ffmpegArg = @$"-i pipe:.png -vf scale=512:-1 -f webm pipe:1";
-                var ffmpegArg = @$"-i pipe:.png -f webm pipe:1";
+                //var ffmpegArg = @$"-i pipe:.png -f webm pipe:1";
                 //var ffmpegArg = @$"-i pipe:.png -vf scale=512:512:force_original_aspect_ratio=decrease:flags=lanczos -pix_fmt yuva420p -c:v libvpx-vp9 -cpu-used 5 -minrate 50k -b:v 350k -maxrate 450k -to 00:00:02.900 -an -y -f webm pipe:1";
+                var ffmpegArg = $@"-i  \\.\pipe\apng_pipe -vf scale=512:512:force_original_aspect_ratio=decrease:flags=lanczos -pix_fmt yuva420p -c:v libvpx-vp9 -cpu-used 5 -minrate 50k -b:v 350k -maxrate 450k -to 00:00:02.900 -an -y -f  webm pipe:1";
                 Stream imgsZip = null;
                 string downloadUrl = string.Format(_botConfig.LineAnimatedStickerUrl, stickerNumber);
                 try
@@ -393,10 +382,12 @@ namespace LineStickerToTGBotAPI.Services
                                 using (MemoryStream ms = new MemoryStream())
                                 {
 
-                                    var result = await Cli.Wrap(_ffmpegPathRootPath)
+                                    StartNamePipedServer(entry.Open());
+                                    var result = await Cli.Wrap("ffmpeg")
                                                  .WithArguments(ffmpegArg)
-                                                 .WithStandardInputPipe(PipeSource.FromStream(entry.Open()))
+                                                 //.WithStandardInputPipe(PipeSource.FromStream(entry.Open()))
                                                  .WithStandardOutputPipe(PipeTarget.ToStream(ms))
+                                                 .WithValidation(CommandResultValidation.ZeroExitCode)
                                                  .ExecuteAsync();
 
                                     ms.Seek(0, SeekOrigin.Begin);
@@ -446,6 +437,29 @@ namespace LineStickerToTGBotAPI.Services
         {
             _logger.LogInformation("Unknown update type: {UpdateType}", update.Type);
             return Task.CompletedTask;
+        }
+
+        public void StartNamePipedServer(Stream data)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                using (var server = new NamedPipeServerStream("apng_pipe"))
+                {
+                    // wait for ffmpeg command
+                    server.WaitForConnection();
+                    CopyStream(data, server);
+                }
+            });
+        }
+
+        public static void CopyStream(Stream input, Stream output)
+        {
+            int read;
+            byte[] buffer = new byte[0x1024];
+            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                output.Write(buffer, 0, read);
+            }
         }
     }
 }
