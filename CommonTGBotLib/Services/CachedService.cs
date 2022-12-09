@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,6 @@ namespace CommonTGBotLib.Services
 {
     public class CachedService : ICachedService
     {
-
 
         private readonly IDistributedCache _db;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -26,8 +26,28 @@ namespace CommonTGBotLib.Services
             _db = db;
         }
 
+        public async Task<byte[]> GetByteAsync<T>(string key)
+        {
+            return await _db.GetAsync(key);
+        }
 
-        public async Task<T?> GetAsync<T>(string key) where T : class
+        public async Task SetByteAsync(string key, byte[] data, TimeSpan? time)
+        {
+            if (!time.HasValue)
+            {
+                time = TimeSpan.FromDays(30);
+            }
+
+            var options = new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = time
+            };
+
+            await _db.SetAsync(key, data, options);
+        }
+
+
+        public async Task<T?> GetJsonAsync<T>(string key) where T : class
         {
             string data = await _db.GetStringAsync(key);
 
@@ -38,7 +58,7 @@ namespace CommonTGBotLib.Services
             return default(T);
         }
 
-        public T? Get<T>(string key) where T : class
+        public T? GetJson<T>(string key) where T : class
         {
             string data = _db.GetString(key);
 
@@ -49,7 +69,10 @@ namespace CommonTGBotLib.Services
             return default(T);
         }
 
-        public async Task<bool> SetAsync<T>(string key, T data, TimeSpan? time) where T : class
+
+
+
+        public async Task SetJsonAsync<T>(string key, T data, TimeSpan? time) where T : class
         {
             if (!time.HasValue)
             {
@@ -65,10 +88,9 @@ namespace CommonTGBotLib.Services
                   key, JsonConvert.SerializeObject(data),
                   options);
 
-            return true;
         }
 
-        public bool Set<T>(string key, T data, TimeSpan? time) where T : class
+        public bool SetJson<T>(string key, T data, TimeSpan? time) where T : class
         {
             if (!time.HasValue)
             {
@@ -83,28 +105,23 @@ namespace CommonTGBotLib.Services
             _db.SetString(
                   key, JsonConvert.SerializeObject(data),
                   options);
-
             return true;
         }
 
-        public async Task<T?> GetAndSetAsync<T>(string key, T data, TimeSpan? time = null) where T : class
+        public async Task<T?> GetAndSetJsonAsync<T>(string key, T data, TimeSpan? time = null) where T : class
         {
-            var cachedData = await GetAsync<T>(key);
+            var cachedData = await GetJsonAsync<T>(key);
             if (cachedData != null)
             {
                 return cachedData;
             }
-            var result = await SetAsync(key, data, time);
-            if (result)
-            {
-                return await GetAsync<T>(key);
-            }
-            return default;
+            await SetJsonAsync(key, data, time);
+            return await GetJsonAsync<T>(key);
         }
 
-        public async Task<T?> GetAndSetAsync<T>(string key, Func<Task<T>> acquire, TimeSpan? time = null) where T : class
+        public async Task<T?> GetAndSetJsonAsync<T>(string key, Func<Task<T>> acquire, TimeSpan? time = null) where T : class
         {
-            var cachedData = await GetAsync<T>(key);
+            var cachedData = await GetJsonAsync<T>(key);
             if (cachedData != null)
             {
                 return cachedData;
@@ -113,15 +130,15 @@ namespace CommonTGBotLib.Services
 
             if (data != null)
             {
-                await SetAsync(key, data, time);
+                await SetJsonAsync(key, data, time);
             }
 
             return data;
         }
 
-        public T? GetAndSet<T>(string key, Func<T> acquire, TimeSpan? time = null) where T : class
+        public T? GetAndSetJson<T>(string key, Func<T> acquire, TimeSpan? time = null) where T : class
         {
-            var cachedData = Get<T>(key);
+            var cachedData = GetJson<T>(key);
             if (cachedData != null)
             {
                 return cachedData;
@@ -130,7 +147,7 @@ namespace CommonTGBotLib.Services
 
             if (data != null)
             {
-                Set(key, data, time);
+                SetJson(key, data, time);
             }
             return data;
         }

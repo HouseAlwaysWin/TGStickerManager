@@ -17,6 +17,7 @@ using AngleSharp;
 using AngleSharpIConfiguration = AngleSharp.IConfiguration;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 using System.Text;
+using CommonTGBotLib.Services;
 
 namespace TGStickerAPI.Services
 {
@@ -24,19 +25,20 @@ namespace TGStickerAPI.Services
     {
         private readonly ILogger<TGStickerService> _logger;
         private ITelegramBotClient _botClient;
+        private ICachedService _cachedService;
         private readonly BotConfiguration _botConfig;
-        //private string _ffmpegPathRootPath;
         private Dictionary<string, BotCommandInfo> _commands;
         public TGStickerService(
             ILogger<TGStickerService> logger,
             IConfiguration configuration,
-            ITelegramBotClient telegramBotClient)
+            ITelegramBotClient telegramBotClient,
+            ICachedService cachedService)
         {
             _logger = logger;
             _botClient = telegramBotClient;
             _botConfig = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
-            //_ffmpegPathRootPath = Path.Combine(AppContext.BaseDirectory, "FFmpeg", "ffmpeg.exe");
             _commands = InitCommandsMapperAsync().Result;
+            _cachedService = cachedService;
         }
 
         private async Task<Dictionary<string, BotCommandInfo>> InitCommandsMapperAsync()
@@ -134,7 +136,7 @@ namespace TGStickerAPI.Services
             int stickerNumber = 23303;
             var guidstring = Guid.NewGuid().ToString("N");
             //var stickerName = $"linesticker_{guidstring}_by_{botInfo.Username}";
-            await AddAutoLineStickerToVideoStickerAsync(message.From.Id, "", stickerName, stickerNumber);
+            await AddAllVideoStickerSetAsync(message.From.Id, "", stickerName, stickerNumber);
 
 
             var stickerSet = await _botClient.GetStickerSetAsync(
@@ -221,7 +223,18 @@ namespace TGStickerAPI.Services
             }
         }
 
-        private async Task AddNewVideoStickerSetAsync(string stickerName, string title, long userId, string emojiString, ZipArchive zipFile, string ffmpegArg)
+
+        private async Task SaveLineStickerToCached(string stickerNumber)
+        {
+            string downloadUrl = string.Format(_botConfig.LineAnimatedStickerUrl, stickerNumber);
+            using (var hc = new HttpClient())
+            {
+
+            }
+        }
+
+            // Add New Sticker
+            private async Task AddNewVideoStickerSetAsync(string stickerName, string title, long userId, string emojiString, ZipArchive zipFile, string ffmpegArg)
         {
             using (MemoryStream ms = new MemoryStream())
             {
@@ -254,7 +267,7 @@ namespace TGStickerAPI.Services
             }
         }
 
-        private async Task AddAutoLineStickerToVideoStickerAsync(long userId, string title, string stickerName, int stickerNumber)
+        private async Task AddAllVideoStickerSetAsync(long userId, string title, string stickerName, int stickerNumber)
         {
 
             using (var hc = new HttpClient())
@@ -263,9 +276,6 @@ namespace TGStickerAPI.Services
                 var botInfo = await _botClient.GetMeAsync();
 
                 var emojiString = char.ConvertFromUtf32(emojiUnicode);
-                //var ffmpegArg = @$"-i pipe:.png -vf scale=512:-1 -f webm pipe:1";
-                //var ffmpegArg = @$"-i pipe:.png -f webm pipe:1";
-                //var ffmpegArg = @$"-i pipe:.png -vf scale=512:512:force_original_aspect_ratio=decrease:flags=lanczos -pix_fmt yuva420p -c:v libvpx-vp9 -cpu-used 5 -minrate 50k -b:v 350k -maxrate 450k -to 00:00:02.900 -an -y -f webm pipe:1";
                 var ffmpegArg = $@"-i  \\.\pipe\apng_pipe -vf scale=512:512:force_original_aspect_ratio=decrease:flags=lanczos -pix_fmt yuva420p -c:v libvpx-vp9 -cpu-used 5 -minrate 50k -b:v 350k -maxrate 450k -to 00:00:02.900 -an -y -f  webm pipe:1";
                 Stream imgsZip = null;
                 string downloadUrl = string.Format(_botConfig.LineAnimatedStickerUrl, stickerNumber);
@@ -300,9 +310,6 @@ namespace TGStickerAPI.Services
                                                  .ExecuteAsync();
 
                                     ms.Seek(0, SeekOrigin.Begin);
-                                    //firstEmojiUnicode++;
-                                    //var emojiString = char.ConvertFromUtf32(firstEmojiUnicode);
-
                                     await _botClient.AddVideoStickerToSetAsync(
                                          userId: userId,
                                          name: stickerName,
@@ -328,7 +335,7 @@ namespace TGStickerAPI.Services
                 case "NewLineSticker":
                     StringBuilder msg = new StringBuilder("請傳送Line貼圖連結");
                     msg.AppendLine("例如:");
-                    await _botClient.SendTextMessageAsync(query.From.Id, 
+                    await _botClient.SendTextMessageAsync(query.From.Id,
                         @"請傳送Line貼圖連結");
                     break;
             }
