@@ -10,28 +10,32 @@ using System.Text.RegularExpressions;
 using CliWrap;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using LineStickerToTGBotAPI.Models;
+using TGStickerAPI.Models;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.IO.Pipes;
+using AngleSharp;
+using AngleSharpIConfiguration = AngleSharp.IConfiguration;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
+using System.Text;
 
-namespace LineStickerToTGBotAPI.Services
+namespace TGStickerAPI.Services
 {
-    public class LineStickerConvertService : ILineStickerConvertService
+    public class TGStickerService : ITGStickerService
     {
-        private readonly ILogger<LineStickerConvertService> _logger;
+        private readonly ILogger<TGStickerService> _logger;
         private ITelegramBotClient _botClient;
         private readonly BotConfiguration _botConfig;
-        private string _ffmpegPathRootPath;
+        //private string _ffmpegPathRootPath;
         private Dictionary<string, BotCommandInfo> _commands;
-        public LineStickerConvertService(
-            ILogger<LineStickerConvertService> logger,
+        public TGStickerService(
+            ILogger<TGStickerService> logger,
             IConfiguration configuration,
             ITelegramBotClient telegramBotClient)
         {
             _logger = logger;
             _botClient = telegramBotClient;
             _botConfig = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
-            _ffmpegPathRootPath = Path.Combine(AppContext.BaseDirectory, "FFmpeg", "ffmpeg.exe");
+            //_ffmpegPathRootPath = Path.Combine(AppContext.BaseDirectory, "FFmpeg", "ffmpeg.exe");
             _commands = InitCommandsMapperAsync().Result;
         }
 
@@ -141,7 +145,7 @@ namespace LineStickerToTGBotAPI.Services
             {
                 await _botClient.DeleteStickerFromSetAsync(s.FileId);
             }
-       
+
             stickerSet = await _botClient.GetStickerSetAsync(
                 name: stickerName
             );
@@ -318,6 +322,16 @@ namespace LineStickerToTGBotAPI.Services
 
         private async Task OnCallbackQueryAsync(CallbackQuery query)
         {
+            var data = query.Data;
+            switch (data)
+            {
+                case "NewLineSticker":
+                    StringBuilder msg = new StringBuilder("請傳送Line貼圖連結");
+                    msg.AppendLine("例如:");
+                    await _botClient.SendTextMessageAsync(query.From.Id, 
+                        @"請傳送Line貼圖連結");
+                    break;
+            }
 
         }
 
@@ -352,19 +366,29 @@ namespace LineStickerToTGBotAPI.Services
                 {
                     // wait for ffmpeg command
                     server.WaitForConnection();
-                    CopyStream(data, server);
+                    //CopyStream(data, server);
+                    data.CopyTo(server);
                 }
             });
         }
 
-        public static void CopyStream(Stream input, Stream output)
+        public async Task<string> GetStickerName(string stickerUrl)
         {
-            int read;
-            byte[] buffer = new byte[0x1024];
-            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                output.Write(buffer, 0, read);
-            }
+            var config = AngleSharp.Configuration.Default.WithDefaultLoader();
+            var context = BrowsingContext.New(config);
+            var document = await context.OpenAsync(stickerUrl);
+            var title = document.QuerySelectorAll("[data-test='sticker-name-title']").FirstOrDefault()?.TextContent;
+            return title;
         }
+
+        //public static void CopyStream(Stream input, Stream output)
+        //{
+        //    int read;
+        //    byte[] buffer = new byte[0x1024];
+        //    while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+        //    {
+        //        output.Write(buffer, 0, read);
+        //    }
+        //}
     }
 }

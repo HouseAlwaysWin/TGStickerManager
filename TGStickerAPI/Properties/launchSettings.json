@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "LineStickerToTGBot.Net": {
+    "TGStickerManager": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

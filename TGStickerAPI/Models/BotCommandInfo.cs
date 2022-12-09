@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types;
 
-namespace LineStickerToTGBotAPI.Models
+namespace TGStickerAPI.Models
 {
     public class BotCommandInfo : BotCommand
     {

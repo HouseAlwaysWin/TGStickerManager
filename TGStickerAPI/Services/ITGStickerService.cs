@@ -1,8 +1,8 @@
 ﻿using Telegram.Bot.Types;
 
-namespace LineStickerToTGBotAPI.Services
+namespace TGStickerAPI.Services
 {
-    public interface ILineStickerConvertService
+    public interface ITGStickerService
     {
         Task HandleErrorAsync(Exception exception);
         Task HandleRequestAsync(Update update);

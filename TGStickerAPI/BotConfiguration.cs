@@ -1,4 +1,4 @@
-﻿namespace LineStickerToTGBotAPI
+﻿namespace TGStickerAPI
 {
     public class BotConfiguration
     {

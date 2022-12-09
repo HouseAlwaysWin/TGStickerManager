@@ -1,17 +1,17 @@
-﻿using LineStickerToTGBotAPI.Services;
+﻿using TGStickerAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
 using Telegram.Bot.Types;
 
-namespace LineStickerToTGBotAPI.Controllers
+namespace TGStickerAPI.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
     public class BotController : ControllerBase
     {
-        private readonly ILineStickerConvertService _lineService;
+        private readonly ITGStickerService _lineService;
 
-        public BotController(ILineStickerConvertService lineService)
+        public BotController(ITGStickerService lineService)
         {
             _lineService = lineService;
         }

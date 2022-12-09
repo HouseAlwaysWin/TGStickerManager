@@ -1,5 +1,5 @@
-using LineStickerToTGBotAPI;
-using LineStickerToTGBotAPI.Services;
+using TGStickerAPI;
+using TGStickerAPI.Services;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +16,7 @@ builder.Host.ConfigureAppConfiguration((host, config) =>
 });
 
 builder.Services.AddHostedService<BotConfigService>();
-builder.Services.AddScoped<ILineStickerConvertService, LineStickerConvertService>();
+builder.Services.AddScoped<ITGStickerService, TGStickerService>();
 
 var botConfig = builder.Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
 builder.Services.AddHttpClient("LineStickerToTG")

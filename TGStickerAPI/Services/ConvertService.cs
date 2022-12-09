@@ -1,4 +1,4 @@
-﻿namespace LineStickerToTGBotAPI.Services
+﻿namespace TGStickerAPI.Services
 {
     public class ConvertService
     {

@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot.Types.Enums;
 using Telegram.Bot;
 
-namespace LineStickerToTGBotAPI.Services
+namespace TGStickerAPI.Services
 {
     public class BotConfigService : IHostedService
     {
